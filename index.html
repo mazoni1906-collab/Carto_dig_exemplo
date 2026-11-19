@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#102a25">
+  <meta name="description" content="Portal WebGIS para consulta de hidrografia, rodovias e limites territoriais de Minas Gerais.">
+  <title>Atlas MG — Portal WebGIS</title>
+  <link rel="preconnect" href="https://unpkg.com">
+  <link rel="preconnect" href="https://tile.openstreetmap.org">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
+  <link rel="stylesheet" href="./styles.css">
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="#" aria-label="Atlas MG, início">
+      <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 32 32"><path d="M4 23 10 7l5 11 4-8 9 13H4Z"/><path d="M5 26c4-3 7 3 11 0s7-3 11 0"/></svg></span>
+      <span><strong>ATLAS <b>MG</b></strong><small>PORTAL DE INFORMAÇÕES GEOGRÁFICAS</small></span>
+    </a>
+    <div class="top-meta"><span class="live-dot"></span> DADOS TERRITORIAIS DE MINAS GERAIS <span class="top-separator">/</span> WEBGIS</div>
+    <button id="aboutButton" class="top-action" type="button" title="Sobre o portal"><span>i</span> Sobre</button>
+  </header>
+
+  <main class="workspace">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-heading">
+        <div class="eyebrow">EXPLORADOR GEOGRÁFICO</div>
+        <h1>Minas Gerais</h1>
+        <p>Explore as redes hidrográfica e rodoviária e o limite estadual.</p>
+      </div>
+
+      <section class="search-section">
+        <label class="section-label" for="searchInput">BUSCAR NAS CAMADAS</label>
+        <div class="search-box"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.3"/><path d="m16 16 4.3 4.3"/></svg><input id="searchInput" type="search" placeholder="Nome de rio, rodovia ou código…" autocomplete="off"><kbd>/</kbd></div>
+        <div id="searchResults" class="search-results" hidden></div>
+        <div class="search-hint">A busca consulta os atributos das camadas carregadas.</div>
+      </section>
+
+      <section class="layers-section">
+        <div class="section-title-row"><span class="section-label">CAMADAS DO MAPA</span><button id="toggleAll" class="text-button" type="button">Ocultar todas</button></div>
+        <div class="layer-card" data-layer="hydro">
+          <label class="layer-main"><input class="layer-toggle" type="checkbox" checked><span class="check-ui"></span><span class="layer-symbol hydro-symbol"><i></i></span><span class="layer-names"><strong>Hidrografia</strong><small>Rede de drenagem</small></span></label>
+          <button class="layer-info" type="button" aria-label="Informações sobre hidrografia">i</button>
+          <div class="layer-detail"><div class="layer-count" id="count-hydro">Preparando dados…</div><label>Opacidade <input class="opacity-slider" type="range" min="20" max="100" value="88" aria-label="Opacidade da hidrografia"><span>88%</span></label><a href="./data/Hidro_rep.geojson" download>Baixar GeoJSON original ↗</a></div>
+        </div>
+        <div class="layer-card" data-layer="roads">
+          <label class="layer-main"><input class="layer-toggle" type="checkbox" checked><span class="check-ui"></span><span class="layer-symbol roads-symbol"><i></i></span><span class="layer-names"><strong>Rodovias</strong><small>Malha rodoviária</small></span></label>
+          <button class="layer-info" type="button" aria-label="Informações sobre rodovias">i</button>
+          <div class="layer-detail"><div class="layer-count" id="count-roads">Preparando dados…</div><label>Opacidade <input class="opacity-slider" type="range" min="20" max="100" value="92" aria-label="Opacidade das rodovias"><span>92%</span></label><a href="./data/Rodo_rep.geojson" download>Baixar GeoJSON original ↗</a></div>
+        </div>
+        <div class="layer-card" data-layer="boundary">
+          <label class="layer-main"><input class="layer-toggle" type="checkbox" checked><span class="check-ui"></span><span class="layer-symbol boundary-symbol"><i></i></span><span class="layer-names"><strong>Limite estadual</strong><small>Minas Gerais · IBGE</small></span></label>
+          <button class="layer-info" type="button" aria-label="Informações sobre o limite">i</button>
+          <div class="layer-detail"><div class="layer-count" id="count-boundary">Preparando dados…</div><label>Opacidade <input class="opacity-slider" type="range" min="20" max="100" value="100" aria-label="Opacidade do limite estadual"><span>100%</span></label><a href="./data/Limite_rep.geojson" download>Baixar GeoJSON original ↗</a></div>
+        </div>
+      </section>
+
+      <section class="basemap-section">
+        <div class="section-label">MAPA DE FUNDO</div>
+        <div class="basemap-options">
+          <button class="basemap-option selected" data-basemap="streets" type="button"><span class="basemap-preview streets-preview"><i></i></span><span><strong>Ruas</strong><small>OpenStreetMap</small></span><span class="radio-dot"></span></button>
+          <button class="basemap-option" data-basemap="satellite" type="button"><span class="basemap-preview satellite-preview"><i></i></span><span><strong>Satélite</strong><small>Esri World Imagery</small></span><span class="radio-dot"></span></button>
+        </div>
+      </section>
+
+      <section class="legend-section"><div class="section-label">LEGENDA</div><div class="legend-row"><span class="legend-line hydro-line"></span> Cursos d’água</div><div class="legend-row"><span class="legend-line road-line"></span> Rodovias</div><div class="legend-row"><span class="legend-area"></span> Limite de Minas Gerais</div></section>
+      <div class="sidebar-footer"><span class="footer-mark">MG</span><span>Camadas em SIRGAS 2000 · EPSG:4674<br>Visualização cartográfica em WGS 84</span></div>
+    </aside>
+
+    <section class="map-shell" aria-label="Mapa interativo de Minas Gerais">
+      <div id="map"></div>
+      <div class="map-toolbar map-toolbar-left"><button id="locateButton" class="map-tool" type="button" title="Minha localização" aria-label="Minha localização"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2"/><path d="M12 2v3m0 14v3M2 12h3m14 0h3"/></svg></button><button id="homeButton" class="map-tool" type="button" title="Enquadrar Minas Gerais" aria-label="Enquadrar Minas Gerais"><svg viewBox="0 0 24 24"><path d="M3 8V3h5m8 0h5v5m0 8v5h-5m-8 0H3v-5"/><path d="M8 8h8v8H8z"/></svg></button><span class="tool-divider"></span><button id="measureButton" class="map-tool measure-tool" type="button" title="Medir distância" aria-label="Medir distância"><svg viewBox="0 0 24 24"><path d="m4 17 13-13 4 4L8 21zM14 7l3 3m-6 0 2 2m-6 0 3 3"/></svg></button><button id="clearMeasure" class="map-tool clear-measure" type="button" title="Limpar medição" aria-label="Limpar medição" hidden>×</button></div>
+      <div class="map-toolbar map-toolbar-right"><button id="downloadView" class="map-tool export-tool" type="button" title="Exportar camadas visíveis" aria-label="Exportar camadas visíveis"><svg viewBox="0 0 24 24"><path d="M12 3v12m-5-5 5 5 5-5M4 17v4h16v-4"/></svg></button><button id="fullscreenButton" class="map-tool" type="button" title="Tela cheia" aria-label="Tela cheia"><svg viewBox="0 0 24 24"><path d="M8 3H3v5m13-5h5v5M3 16v5h5m13-5v5h-5"/></svg></button></div>
+      <div class="coordinates" id="coordinates">Lat — · Lon —</div>
+      <div class="measure-hint" id="measureHint" hidden>Clique no mapa para marcar pontos <button id="finishMeasure" type="button">Concluir</button></div>
+      <div class="map-loading" id="loadingStatus"><span class="loading-spinner"></span><span><strong>Carregando camadas</strong><small id="loadingText">Iniciando visualizador…</small></span><button id="dismissLoading" type="button" aria-label="Fechar">×</button></div>
+      <div class="toast" id="toast" role="status" aria-live="polite"></div>
+      <div class="map-footer">ATLAS MG <span>·</span> PORTAL WEBGIS <span id="scaleText">· Escala dinâmica</span></div>
+    </section>
+  </main>
+
+  <dialog id="aboutDialog"><button class="dialog-close" type="button" aria-label="Fechar">×</button><div class="eyebrow">ATLAS MG · PORTAL WEBGIS</div><h2>Dados geográficos de Minas Gerais</h2><p>Visualizador das camadas de hidrografia, malha rodoviária e limite estadual fornecidas com este projeto. Os dados são apresentados no sistema de referência SIRGAS 2000 (EPSG:4674).</p><p>Para agilizar a navegação, o mapa utiliza cópias simplificadas dos GeoJSON. Os arquivos originais podem ser baixados na seção de cada camada.</p><p class="dialog-attribution">Mapas de fundo: © OpenStreetMap contributors · Esri, Maxar, Earthstar Geographics.</p></dialog>
+  <script src="./app.js"></script>
+</body>
+</html>
